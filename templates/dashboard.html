@@ -1,0 +1,1134 @@
+{% extends "base.html" %}
+
+{% block title %}BlueprintAI | Dashboard{% endblock %}
+
+{% block head_extra %}
+<style>
+  :root {
+    --card-bg: var(--surface-card, #ffffff);
+  }
+  body { background-color: var(--surface-bg); overflow: hidden; }
+  main { display: contents; } /* remove main wrapper margins for full-height layout */
+  
+  .follow-up-suggestions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 12px;
+    transition: opacity 0.2s ease, max-height 0.2s ease;
+  }
+  .follow-up-suggestion-pill {
+    background-color: var(--card-bg, #ffffff);
+    border: 1px solid var(--border-color, #e0e0e0);
+    color: var(--text-secondary, #666666);
+    border-radius: 16px;
+    padding: 6px 12px;
+    font-size: 0.8rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+  }
+  .follow-up-suggestion-pill:hover {
+    background-color: var(--hover-bg, #f5f5f5);
+    border-color: var(--primary-color, #0f62fe);
+    color: var(--primary-color, #0f62fe);
+  }
+  [data-bs-theme="dark"] .follow-up-suggestion-pill {
+    background-color: #1e1e1e;
+    border-color: #333333;
+    color: #cccccc;
+  }
+  [data-bs-theme="dark"] .follow-up-suggestion-pill:hover {
+    background-color: #2d2d2d;
+    border-color: #0f62fe;
+    color: #ffffff;
+  }
+
+  /* ── Premium Consulting Components ───────────────────────────────── */
+  .kpi-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 16px;
+    margin-bottom: 24px;
+    margin-top: 12px;
+  }
+  .kpi-card {
+    background: var(--card-bg, #ffffff);
+    border: 1px solid var(--border-color, #e5e7eb);
+    border-radius: 8px;
+    padding: 18px 20px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    text-align: left;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    min-height: 125px;
+    height: auto;
+    transition: box-shadow 0.2s ease, border-color 0.2s ease;
+  }
+  .kpi-card:hover {
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+    border-color: var(--primary-color, #0f62fe);
+  }
+  .kpi-value {
+    font-size: 1.35rem;
+    font-weight: 700;
+    color: var(--text-primary, #0f172a);
+    margin: 4px 0;
+  }
+  .kpi-label {
+    font-size: 0.7rem;
+    color: var(--text-secondary, #64748b);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+  .kpi-desc {
+    font-size: 0.78rem;
+    color: var(--text-secondary, #64748b);
+    margin: 0;
+    line-height: 1.4;
+  }
+
+  .competitor-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 16px;
+    margin-bottom: 24px;
+  }
+  .competitor-card {
+    background: var(--card-bg, #ffffff);
+    border: 1px solid var(--border-color, #e0e0e0);
+    border-radius: 8px;
+    padding: 20px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+    transition: all 0.2s ease;
+  }
+  .competitor-card:hover {
+    border-color: var(--primary-color, #0f62fe);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  }
+  .competitor-name {
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: var(--text-primary, #161616);
+    margin-bottom: 12px;
+    border-bottom: 1px solid var(--border-color, #e0e0e0);
+    padding-bottom: 8px;
+  }
+  .competitor-card p {
+    font-size: 0.95rem;
+    margin-bottom: 8px;
+  }
+
+  .persona-card {
+    background: var(--card-bg, #ffffff);
+    border: 1px solid var(--border-color, #e0e0e0);
+    border-radius: 8px;
+    padding: 20px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+    margin-bottom: 20px;
+  }
+  .persona-header {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 16px;
+  }
+  .persona-avatar {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background-color: var(--primary-color, #0f62fe);
+    color: #ffffff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 1.2rem;
+  }
+  .persona-title h4 {
+    margin: 0;
+    font-size: 1.15rem;
+    font-weight: 700;
+  }
+  .persona-role {
+    font-size: 0.85rem;
+    color: var(--text-secondary, #666666);
+  }
+  .persona-body p {
+    margin-bottom: 8px;
+    font-size: 0.95rem;
+  }
+
+  .feature-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+    gap: 16px;
+    margin-bottom: 24px;
+  }
+  .feature-card {
+    background: var(--card-bg, #ffffff);
+    border: 1px solid var(--border-color, #e0e0e0);
+    border-radius: 8px;
+    padding: 20px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+    position: relative;
+    padding-top: 40px;
+  }
+  .feature-badge {
+    position: absolute;
+    top: 12px;
+    left: 20px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    padding: 2px 8px;
+    border-radius: 4px;
+    text-transform: uppercase;
+  }
+  .badge-must {
+    background-color: rgba(218, 30, 40, 0.15) !important;
+    color: #da1e28 !important;
+    border: 1px solid #da1e28 !important;
+  }
+  .badge-should {
+    background-color: rgba(36, 161, 72, 0.15) !important;
+    color: #24a148 !important;
+    border: 1px solid #24a148 !important;
+  }
+  .badge-could {
+    background-color: rgba(15, 98, 254, 0.15) !important;
+    color: #0f62fe !important;
+    border: 1px solid #0f62fe !important;
+  }
+  .feature-title {
+    font-size: 1.1rem;
+    font-weight: 700;
+    margin-bottom: 8px;
+  }
+  .feature-card p {
+    font-size: 0.9rem;
+    color: var(--text-secondary, #666666);
+    margin: 0;
+  }
+
+  .gtm-timeline {
+    position: relative;
+    border-left: 2px solid var(--border-color, #e0e0e0);
+    padding-left: 24px;
+    margin-left: 12px;
+    margin-bottom: 24px;
+  }
+  .timeline-item {
+    position: relative;
+    margin-bottom: 24px;
+  }
+  .timeline-item:last-child {
+    margin-bottom: 0;
+  }
+  .timeline-badge {
+    position: absolute;
+    left: -38px;
+    top: 2px;
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    background-color: var(--card-bg, #ffffff);
+    border: 2px solid var(--primary-color, #0f62fe);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: var(--primary-color, #0f62fe);
+  }
+  .timeline-content {
+    background: var(--card-bg, #ffffff);
+    border: 1px solid var(--border-color, #e0e0e0);
+    border-radius: 8px;
+    padding: 16px 20px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+  }
+  .timeline-content h5 {
+    margin: 0 0 6px 0;
+    font-size: 1.1rem;
+    font-weight: 700;
+  }
+  .timeline-content p {
+    margin: 0;
+    font-size: 0.95rem;
+    color: var(--text-secondary, #666666);
+  }
+
+  .risk-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 16px;
+    margin-bottom: 24px;
+  }
+  .risk-card {
+    background: var(--card-bg, #ffffff);
+    border: 1px solid var(--border-color, #e0e0e0);
+    border-radius: 8px;
+    padding: 20px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+    position: relative;
+    padding-top: 40px;
+  }
+  .risk-badge {
+    position: absolute;
+    top: 12px;
+    left: 20px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    padding: 2px 8px;
+    border-radius: 4px;
+    text-transform: uppercase;
+  }
+  .badge-high {
+    background-color: rgba(218, 30, 40, 0.15) !important;
+    color: #da1e28 !important;
+    border: 1px solid #da1e28 !important;
+  }
+  .badge-medium {
+    background-color: rgba(241, 194, 27, 0.15) !important;
+    color: #b58900 !important;
+    border: 1px solid #f1c21b !important;
+  }
+  .risk-title {
+    font-size: 1.1rem;
+    font-weight: 700;
+    margin-bottom: 8px;
+  }
+  .risk-card p {
+    font-size: 0.95rem;
+    margin: 0;
+  }
+  
+  /* Executive summary callout box */
+  .report-card__content blockquote,
+  .print-section-content blockquote {
+    background: rgba(15, 98, 254, 0.06);
+    border-left: 4px solid var(--primary-color, #0f62fe);
+    padding: 16px 20px;
+    margin: 0 0 24px 0;
+    border-radius: 0 8px 8px 0;
+    font-size: 1rem;
+    line-height: 1.6;
+    color: var(--text-primary, #161616);
+  }
+  [data-bs-theme="dark"] .report-card__content blockquote {
+    background: rgba(15, 98, 254, 0.12);
+  }
+
+  /* LaTeX Math Styling */
+  .latex-math-block {
+    display: block;
+    text-align: center;
+    font-family: monospace;
+    font-style: italic;
+    background: var(--surface-bg, #f4f4f4);
+    padding: 12px;
+    border-radius: 8px;
+    margin: 16px 0;
+    border: 1px solid var(--border-color, #e0e0e0);
+  }
+  .latex-math-inline {
+    font-family: monospace;
+    font-style: italic;
+    background: var(--surface-bg, #f4f4f4);
+    padding: 2px 6px;
+    border-radius: 4px;
+  }
+
+  .print-only-container {
+    display: none;
+  }
+
+  /* CSS Chart Components */
+  .chart-container {
+    background: var(--card-bg, #ffffff);
+    border: 1px solid var(--border-color, #e0e0e0);
+    border-radius: 8px;
+    padding: 20px;
+    margin-bottom: 24px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+  }
+  .chart-title {
+    font-size: 1.1rem;
+    font-weight: 700;
+    margin-bottom: 16px;
+    color: var(--text-primary, #161616);
+  }
+  .chart-row {
+    display: flex;
+    align-items: center;
+    margin-bottom: 12px;
+    gap: 12px;
+  }
+  .chart-row:last-child {
+    margin-bottom: 0;
+  }
+  .chart-label {
+    width: 120px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--text-secondary, #666666);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .chart-bar-wrapper {
+    flex-grow: 1;
+    height: 12px;
+    background-color: var(--hover-bg, #f5f5f5);
+    border-radius: 6px;
+    overflow: hidden;
+  }
+  .chart-bar {
+    height: 100%;
+    border-radius: 6px;
+    transition: width 0.6s ease;
+  }
+  .chart-value {
+    min-width: 80px;
+    width: auto;
+    text-align: right;
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: var(--text-primary, #161616);
+    white-space: nowrap;
+  }
+
+  /* ── Print/PDF Styles ────────────────────────────────────────────── */
+  @media print {
+    @page {
+      size: letter;
+      margin: 0.8in;
+    }
+
+    body {
+      background: #ffffff !important;
+      color: #000000 !important;
+      font-family: 'Inter', system-ui, -apple-system, sans-serif !important;
+      font-size: 11pt !important;
+      line-height: 1.5 !important;
+      overflow: visible !important;
+    }
+    
+    /* Hide screen UI elements */
+    .dashboard-root,
+    .dashboard-sidebar, 
+    .dashboard-topbar, 
+    .startup-header-card, 
+    .report-panel, 
+    .section-nav-arrows, 
+    .follow-up-container, 
+    .sidebar-backdrop,
+    .theme-toggle,
+    #themeToggleDash,
+    header {
+      display: none !important;
+    }
+    
+    /* Display print container */
+    #blueprintPrintView {
+      display: block !important;
+    }
+    
+    /* Cover Page */
+    .print-cover {
+      page-break-after: always;
+      break-after: page;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      padding: 4rem 0 2rem;
+      box-sizing: border-box;
+    }
+    .print-cover-logo {
+      font-size: 2.5rem;
+      font-weight: 800;
+      color: #0f62fe;
+      margin-bottom: 2rem;
+    }
+    .print-cover-logo strong {
+      color: #000000;
+    }
+    .print-cover-title {
+      font-size: 3rem;
+      font-weight: 800;
+      margin-bottom: 1rem;
+      color: #161616;
+    }
+    .print-cover-subtitle {
+      font-size: 1.5rem;
+      color: #525252;
+      margin-bottom: 3rem;
+    }
+    .print-cover-meta {
+      font-size: 1.1rem;
+      color: #525252;
+      border-top: 1px solid #e0e0e0;
+      padding-top: 2rem;
+      width: 100%;
+      max-width: 400px;
+      text-align: left;
+    }
+    .print-cover-meta-item {
+      margin-bottom: 0.5rem;
+    }
+
+    /* Table of Contents Page */
+    .print-toc-page {
+      page-break-after: always;
+      break-after: page;
+      padding: 2rem 0;
+      box-sizing: border-box;
+      min-height: 70vh;
+    }
+    .print-toc-title {
+      font-size: 2rem;
+      font-weight: 700;
+      margin-bottom: 2.5rem;
+      border-bottom: 2px solid #0f62fe;
+      padding-bottom: 0.5rem;
+    }
+    .print-toc-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+    .print-toc-item {
+      margin-bottom: 1rem;
+      font-size: 1.1rem;
+    }
+    .print-toc-link {
+      color: #161616 !important;
+      text-decoration: none !important;
+      font-weight: 600;
+    }
+    .print-toc-link:hover {
+      color: #0f62fe !important;
+      text-decoration: underline !important;
+    }
+    
+    /* Section Pages (Continuous flow instead of page breaks) */
+    .print-section {
+      padding: 1rem 0;
+      margin-bottom: 2.5rem;
+      border-bottom: 1px solid #e0e0e0;
+      break-inside: auto;
+      page-break-inside: auto;
+    }
+    .print-section:last-child {
+      border-bottom: none;
+      margin-bottom: 0;
+      padding-bottom: 0;
+    }
+    .print-section-header {
+      font-size: 1.8rem;
+      font-weight: 700;
+      color: #161616;
+      margin-bottom: 1.5rem;
+      border-bottom: 1px solid #e0e0e0;
+      padding-bottom: 0.5rem;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      break-after: avoid-page;
+      page-break-after: avoid;
+    }
+    .print-section-content {
+      color: #393939;
+    }
+    
+    /* Prevent orphaned headings */
+    h1, h2, h3, h4, h5, h6,
+    .print-section-content h1,
+    .print-section-content h2,
+    .print-section-content h3,
+    .print-section-content h4,
+    .print-section-content h5,
+    .print-section-content h6 {
+      break-after: avoid-page;
+      page-break-after: avoid;
+    }
+    
+    /* Spacing consistency */
+    .print-section-content p,
+    .print-section-content ul,
+    .print-section-content ol {
+      margin-bottom: 1.2rem;
+    }
+    .print-section-content li {
+      margin-bottom: 0.4rem;
+    }
+    
+    /* Avoid breaking inside single elements */
+    .print-section-content ul, 
+    .print-section-content ol,
+    .print-section-content p,
+    .table-responsive,
+    .startup-pill {
+      break-inside: avoid;
+      page-break-inside: avoid;
+    }
+    
+    /* Table optimizations */
+    .print-section-content table {
+      width: 100% !important;
+      border-collapse: collapse !important;
+      margin-bottom: 1.5rem !important;
+      break-inside: auto;
+      page-break-inside: auto;
+    }
+    .print-section-content thead {
+      display: table-header-group;
+    }
+    .print-section-content tr {
+      break-inside: avoid;
+      page-break-inside: avoid;
+    }
+    .print-section-content th, 
+    .print-section-content td {
+      border: 1px solid #e0e0e0 !important;
+      padding: 8px 12px !important;
+      text-align: left !important;
+    }
+    .print-section-content th {
+      background-color: #f4f4f4 !important;
+      font-weight: bold !important;
+    }
+
+    /* Print components formatting */
+    .kpi-grid, .gtm-kpi-grid, .competitor-grid, .feature-grid, .risk-grid, .gtm-icp-grid, .gtm-channels-grid, .gtm-strategy-grid {
+      display: grid !important;
+      grid-template-columns: 1fr 1fr !important;
+      gap: 12px !important;
+    }
+    .kpi-card, .gtm-kpi-card, .competitor-card, .persona-card, .feature-card, .timeline-content, .risk-card,
+    .gtm-icp-card, .gtm-positioning-card, .gtm-channel-card, .gtm-tactic-card, .gtm-sales-step {
+      border: 1px solid #d0d0d0 !important;
+      background-color: #ffffff !important;
+      color: #000000 !important;
+      box-shadow: none !important;
+      break-inside: avoid !important;
+      page-break-inside: avoid !important;
+      padding: 12px 16px !important;
+    }
+    .gtm-overview-banner {
+      border: 1px solid #d0d0d0 !important;
+      border-left: 4px solid #0f62fe !important;
+      background-color: #f4f8ff !important;
+      color: #000000 !important;
+      padding: 12px 16px !important;
+      margin-bottom: 1.5rem !important;
+      border-radius: 4px !important;
+    }
+    .gtm-icp-header {
+      background: #f4f4f4 !important;
+      color: #000000 !important;
+      border-bottom: 1px solid #d0d0d0 !important;
+      padding: 10px 12px !important;
+    }
+    .gtm-icp-avatar {
+      background: #0f62fe !important;
+      color: #ffffff !important;
+    }
+    .gtm-icp-header-text h5, .gtm-icp-header-text span {
+      color: #000000 !important;
+    }
+    .gtm-icp-field {
+      background: #ffffff !important;
+      border: 1px solid #e0e0e0 !important;
+    }
+    .gtm-icp-cac-banner {
+      background: #f4f8ff !important;
+      border: 1px solid #d0d0d0 !important;
+    }
+    .gtm-budget-layout {
+      display: block !important;
+    }
+    .gtm-budget-donut-wrap {
+      display: none !important;
+    }
+    .badge-must, .badge-should, .badge-could, .badge-high, .badge-medium, .risk-badge, .timeline-badge {
+      border: 1px solid #8d8d8d !important;
+      color: #000000 !important;
+      background-color: #f4f4f4 !important;
+      -webkit-print-color-adjust: exact !important;
+      print-color-adjust: exact !important;
+    }
+    .report-card__content blockquote,
+    .print-section-content blockquote {
+      border-left: 4px solid #0f62fe !important;
+      background-color: #f4f8ff !important;
+      color: #000000 !important;
+      padding: 12px 16px !important;
+    }
+    
+    /* Print Chart Adaptations */
+    .chart-container {
+      border: 1px solid #d0d0d0 !important;
+      background-color: #ffffff !important;
+      box-shadow: none !important;
+      break-inside: avoid !important;
+      page-break-inside: avoid !important;
+    }
+    .chart-bar-wrapper {
+      background-color: #f4f4f4 !important;
+      -webkit-print-color-adjust: exact !important;
+      print-color-adjust: exact !important;
+    }
+    .chart-bar {
+      -webkit-print-color-adjust: exact !important;
+      print-color-adjust: exact !important;
+    }
+
+    .latex-math-block {
+      border: 1px solid #d0d0d0 !important;
+      background-color: #f9f9f9 !important;
+      color: #000000 !important;
+      padding: 10px !important;
+      margin: 12px 0 !important;
+      font-size: 10pt !important;
+      text-align: center !important;
+      break-inside: avoid !important;
+      page-break-inside: avoid !important;
+    }
+    .latex-math-inline {
+      background-color: #f9f9f9 !important;
+      color: #000000 !important;
+      padding: 2px 4px !important;
+      font-size: 10pt !important;
+    }
+  }
+</style>
+{% endblock %}
+
+{# ── Suppress the global navbar and footer — dashboard is a full-viewport app ── #}
+{% block navbar %}{% endblock %}
+{% block footer %}{% endblock %}
+
+{% block content %}
+
+<div class="dashboard-root">
+
+  <!-- ── Sidebar ──────────────────────────────────────────────────────── -->
+  <aside class="dashboard-sidebar" id="dashboardSidebar">
+
+    <!-- Sidebar header -->
+    <div class="sidebar-header">
+      <span class="brand-icon"><i class="bi bi-diagram-3-fill"></i></span>
+      <span class="sidebar-brand">Blueprint<strong>AI</strong></span>
+      <button class="sidebar-close d-lg-none" id="sidebarClose" aria-label="Close sidebar">
+        <i class="bi bi-x-lg"></i>
+      </button>
+    </div>
+
+    <!-- Startup identity pill (hidden until blueprint loaded) -->
+    <div class="sidebar-startup-info d-none" id="sidebarStartupInfo">
+      <div class="startup-pill">
+        <i class="bi bi-building-fill text-primary me-2"></i>
+        <div class="startup-pill-text">
+          <div class="startup-pill-name" id="sidebarStartupName">—</div>
+          <div class="startup-pill-industry" id="sidebarIndustry">—</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Section navigation -->
+    <nav class="sidebar-nav" aria-label="Blueprint section navigation">
+      <div class="sidebar-section-label">Blueprint Sections</div>
+      <ul class="sidebar-menu list-unstyled" id="sidebarMenu">
+
+        <li>
+          <button class="sidebar-item sidebar-item--locked" data-section="summary" disabled>
+            <i class="bi bi-lightbulb-fill sidebar-icon"></i>
+            <span>Startup Summary</span>
+            <span class="section-status-dot" data-status-for="summary"></span>
+          </button>
+        </li>
+        <li>
+          <button class="sidebar-item sidebar-item--locked" data-section="market_research" disabled>
+            <i class="bi bi-graph-up-arrow sidebar-icon"></i>
+            <span>Market Research</span>
+            <span class="section-status-dot" data-status-for="market_research"></span>
+          </button>
+        </li>
+        <li>
+          <button class="sidebar-item sidebar-item--locked" data-section="competitor_analysis" disabled>
+            <i class="bi bi-trophy-fill sidebar-icon"></i>
+            <span>Competitor Analysis</span>
+            <span class="section-status-dot" data-status-for="competitor_analysis"></span>
+          </button>
+        </li>
+        <li>
+          <button class="sidebar-item sidebar-item--locked" data-section="user_personas" disabled>
+            <i class="bi bi-people-fill sidebar-icon"></i>
+            <span>User Personas</span>
+            <span class="section-status-dot" data-status-for="user_personas"></span>
+          </button>
+        </li>
+        <li>
+          <button class="sidebar-item sidebar-item--locked" data-section="mvp_features" disabled>
+            <i class="bi bi-layers-fill sidebar-icon"></i>
+            <span>MVP Planner</span>
+            <span class="section-status-dot" data-status-for="mvp_features"></span>
+          </button>
+        </li>
+        <li>
+          <button class="sidebar-item sidebar-item--locked" data-section="business_model" disabled>
+            <i class="bi bi-building-fill sidebar-icon"></i>
+            <span>Business Model</span>
+            <span class="section-status-dot" data-status-for="business_model"></span>
+          </button>
+        </li>
+        <li>
+          <button class="sidebar-item sidebar-item--locked" data-section="revenue_model" disabled>
+            <i class="bi bi-currency-dollar sidebar-icon"></i>
+            <span>Revenue Model</span>
+            <span class="section-status-dot" data-status-for="revenue_model"></span>
+          </button>
+        </li>
+        <li>
+          <button class="sidebar-item sidebar-item--locked" data-section="go_to_market" disabled>
+            <i class="bi bi-geo-alt-fill sidebar-icon"></i>
+            <span>Go-to-Market</span>
+            <span class="section-status-dot" data-status-for="go_to_market"></span>
+          </button>
+        </li>
+        <li>
+          <button class="sidebar-item sidebar-item--locked" data-section="risk_analysis" disabled>
+            <i class="bi bi-shield-exclamation sidebar-icon"></i>
+            <span>Risk Analysis</span>
+            <span class="section-status-dot" data-status-for="risk_analysis"></span>
+          </button>
+        </li>
+
+      </ul>
+
+      <!-- Model info -->
+      <div class="sidebar-section-label mt-3">Active Model</div>
+      <div class="sidebar-model-card">
+        <i class="bi bi-cpu-fill me-2 text-primary"></i>
+        <div>
+          <div class="model-name">IBM Granite</div>
+          <div class="model-version" id="modelVersion">granite-4-h-small</div>
+        </div>
+      </div>
+
+      <!-- New Blueprint CTA -->
+      <div class="sidebar-new-blueprint mt-3">
+        <button class="btn btn-outline-primary btn-new-blueprint w-100" id="sidebarNewBlueprintBtn">
+          <i class="bi bi-plus-circle me-2"></i>+ New Blueprint
+        </button>
+      </div>
+    </nav>
+
+  </aside>
+
+  <!-- ── Main content area ─────────────────────────────────────────────── -->
+  <div class="dashboard-main">
+
+    <!-- Top bar -->
+    <header class="dashboard-topbar">
+      <div class="d-flex align-items-center gap-3">
+        <!-- Mobile sidebar toggle -->
+        <button class="btn btn-sm btn-outline-secondary d-lg-none"
+                id="sidebarToggle" aria-label="Open sidebar">
+          <i class="bi bi-list fs-5"></i>
+        </button>
+        <!-- Breadcrumb -->
+        <nav aria-label="breadcrumb">
+          <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item"><a href="/">Home</a></li>
+            <li class="breadcrumb-item active" id="breadcrumbSection">Dashboard</li>
+          </ol>
+        </nav>
+      </div>
+      <div class="d-flex align-items-center gap-2">
+        <!-- Active section badge — hidden on prompt screen, shown during blueprint navigation -->
+        <span class="topbar-badge d-none" id="activeModuleBadge"></span>
+        <button class="btn btn-sm btn-outline-secondary theme-toggle px-2"
+                id="themeToggleDash" title="Toggle dark mode">
+          <i class="bi bi-moon-stars" id="themeIconDash"></i>
+        </button>
+        <!-- New Blueprint (topbar, desktop) -->
+        <button class="btn btn-primary btn-sm px-3 fw-semibold d-none d-md-inline-flex align-items-center"
+                id="topbarNewBlueprintBtn">
+          <i class="bi bi-plus-circle me-1"></i>New Blueprint
+        </button>
+      </div>
+    </header>
+
+    <!-- Content scroll area -->
+    <div class="dashboard-content" id="dashboardContent">
+
+      <!-- ══════════════════════════════════════════════════════════════════
+           AI PROMPT INTERFACE — shown when no blueprint is loaded
+           ══════════════════════════════════════════════════════════════════ -->
+      <div class="ai-prompt-screen" id="aiPromptScreen">
+
+        <!-- Hero heading -->
+        <div class="ai-prompt-hero">
+          <div class="ai-prompt-logo">
+            <span class="brand-icon" style="width:52px;height:52px;font-size:1.4rem;">
+              <i class="bi bi-diagram-3-fill"></i>
+            </span>
+          </div>
+          <h1 class="ai-prompt-title">What's your startup idea?</h1>
+          <p class="ai-prompt-subtitle">
+            Describe your idea in plain language. IBM Granite will generate a complete
+            startup blueprint — market research, competitor analysis, MVP plan, revenue model, and more.
+          </p>
+        </div>
+
+        <!-- Main prompt input card -->
+        <div class="ai-prompt-card" id="aiPromptCard">
+
+          <!-- Error message (hidden by default) -->
+          <div class="ai-prompt-error d-none" id="aiPromptError">
+            <i class="bi bi-exclamation-triangle-fill me-2"></i>
+            <span id="aiPromptErrorMsg">Something went wrong. Please try again.</span>
+            <button class="btn btn-sm btn-outline-danger ms-auto d-none" id="aiPromptRetryBtn" type="button" style="font-size: 0.75rem; padding: 2px 8px; border-color: rgba(218,30,40,.4);">
+              <i class="bi bi-arrow-clockwise me-1"></i>Retry
+            </button>
+          </div>
+
+          <!-- Textarea + send button -->
+          <div class="ai-prompt-input-wrap">
+            <textarea
+              id="aiPromptInput"
+              class="ai-prompt-textarea"
+              placeholder="e.g. Build an AI Study Planner for college students who struggle with time management…"
+              rows="4"
+              maxlength="2000"
+              aria-label="Describe your startup idea"
+            ></textarea>
+            <div class="ai-prompt-input-footer">
+              <span class="ai-prompt-counter" id="aiPromptCounter">0 / 2000</span>
+              <button class="btn btn-primary ai-prompt-send-btn" id="aiPromptSendBtn">
+                <span class="ai-send-default">
+                  <i class="bi bi-rocket-takeoff me-2"></i>Generate Blueprint
+                </span>
+                <span class="ai-send-loading d-none">
+                  <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                  Generating…
+                </span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Example prompts -->
+          <div class="ai-prompt-examples">
+            <span class="ai-examples-label">Try:</span>
+            <button class="ai-example-pill" data-prompt="Build an AI Study Planner for college students who struggle with managing their coursework and deadlines.">
+              <i class="bi bi-book me-1"></i>AI Study Planner
+            </button>
+            <button class="ai-example-pill" data-prompt="Generate a startup blueprint for an online grocery delivery app targeting busy urban families who want fresh produce delivered same-day.">
+              <i class="bi bi-bag me-1"></i>Grocery Delivery App
+            </button>
+            <button class="ai-example-pill" data-prompt="Create a business plan for an AI healthcare assistant that helps patients manage chronic conditions and book appointments.">
+              <i class="bi bi-heart-pulse me-1"></i>AI Healthcare Assistant
+            </button>
+            <button class="ai-example-pill" data-prompt="Build a SaaS platform for small businesses to automate their social media marketing with AI-generated content.">
+              <i class="bi bi-megaphone me-1"></i>AI Social Media SaaS
+            </button>
+          </div>
+        </div>
+
+        <!-- Feature strip -->
+        <div class="ai-prompt-features">
+          <div class="ai-feature-item"><i class="bi bi-graph-up-arrow"></i><span>Market Research</span></div>
+          <div class="ai-feature-item"><i class="bi bi-trophy-fill"></i><span>Competitor Analysis</span></div>
+          <div class="ai-feature-item"><i class="bi bi-people-fill"></i><span>User Personas</span></div>
+          <div class="ai-feature-item"><i class="bi bi-layers-fill"></i><span>MVP Planner</span></div>
+          <div class="ai-feature-item"><i class="bi bi-currency-dollar"></i><span>Revenue Model</span></div>
+          <div class="ai-feature-item"><i class="bi bi-geo-alt-fill"></i><span>Go-to-Market</span></div>
+        </div>
+
+        <!-- IBM badge -->
+        <div class="ai-prompt-ibm-badge">
+          <span class="ibm-badge-sm">IBM</span>
+          <span class="text-muted" style="font-size:.8rem;">watsonx.ai · IBM Granite 4</span>
+        </div>
+
+      </div><!-- /#aiPromptScreen -->
+
+      <!-- ══════════════════════════════════════════════════════════════════
+           LOADING SCREEN — shown while blueprint is being generated
+           ══════════════════════════════════════════════════════════════════ -->
+      <div class="dash-loading-screen d-none" id="dashLoadingScreen">
+        <div class="dash-loading-inner">
+          <div class="gen-spinner">
+            <div class="spinner-ring"></div>
+            <div class="spinner-ring ring2"></div>
+            <div class="spinner-ring ring3"></div>
+          </div>
+          <h3 class="gen-loading-title mt-4" id="genLoadingTitle">Crafting your blueprint…</h3>
+          <p class="gen-loading-sub text-muted" id="genLoadingSub">IBM Granite is analyzing your startup idea</p>
+          <div class="gen-loading-steps mt-3" id="genLoadingSteps">
+            <div class="gen-step active" id="dstep1"><i class="bi bi-cpu-fill"></i> Analyzing your idea</div>
+            <div class="gen-step" id="dstep2"><i class="bi bi-graph-up-arrow"></i> Researching the market</div>
+            <div class="gen-step" id="dstep3"><i class="bi bi-people-fill"></i> Building user personas</div>
+            <div class="gen-step" id="dstep4"><i class="bi bi-layers-fill"></i> Planning MVP features</div>
+            <div class="gen-step" id="dstep5"><i class="bi bi-geo-alt-fill"></i> Designing go-to-market</div>
+            <div class="gen-step" id="dstep6"><i class="bi bi-check-circle-fill"></i> Finalizing your blueprint</div>
+          </div>
+          <div class="gen-loading-startup mt-3" id="dashLoadingLabel"></div>
+        </div>
+      </div><!-- /#dashLoadingScreen -->
+
+      <!-- ══════════════════════════════════════════════════════════════════
+           BLUEPRINT VIEW — shown after blueprint is successfully generated
+           ══════════════════════════════════════════════════════════════════ -->
+      <div id="blueprintView" class="d-none">
+
+        <!-- Startup header card -->
+        <div class="startup-header-card mb-4" id="startupHeaderCard">
+          <div class="d-flex align-items-start justify-content-between flex-wrap gap-3">
+            <div class="d-flex align-items-center gap-3">
+              <div class="startup-header-icon" id="startupHeaderIcon">
+                <i class="bi bi-building-fill"></i>
+              </div>
+              <div>
+                <h3 class="startup-header-name mb-0" id="startupHeaderName">—</h3>
+                <div class="startup-header-meta mt-1">
+                  <span class="startup-meta-tag" id="startupHeaderIndustry">—</span>
+                  <span class="startup-meta-sep">·</span>
+                  <span class="startup-meta-tag" id="startupHeaderAudience">—</span>
+                </div>
+              </div>
+            </div>
+            <div class="d-flex gap-2 flex-wrap">
+              <button class="btn btn-sm btn-outline-secondary" id="copyAllBtn" title="Copy full blueprint">
+                <i class="bi bi-clipboard me-1"></i>Copy Full Blueprint
+              </button>
+              <button class="btn btn-sm btn-outline-primary" id="downloadPdfBtn" title="Export full blueprint as PDF">
+                <i class="bi bi-file-pdf me-1"></i>Export PDF
+              </button>
+            </div>
+          </div>
+
+          <!-- Section progress pills -->
+          <div class="section-pills mt-3" id="sectionPills">
+            {% set pill_sections = [
+              ("summary",             "bi-lightbulb-fill",     "Summary"),
+              ("market_research",     "bi-graph-up-arrow",     "Market"),
+              ("competitor_analysis", "bi-trophy-fill",        "Competitors"),
+              ("user_personas",       "bi-people-fill",        "Personas"),
+              ("mvp_features",        "bi-layers-fill",        "MVP"),
+              ("business_model",      "bi-building-fill",      "Business"),
+              ("revenue_model",       "bi-currency-dollar",    "Revenue"),
+              ("go_to_market",        "bi-geo-alt-fill",       "GTM"),
+              ("risk_analysis",       "bi-shield-exclamation", "Risks")
+            ] %}
+            {% for sec_key, icon, pill_label in pill_sections %}
+            <button class="section-pill {% if sec_key == 'summary' %}active{% endif %}"
+                    data-section="{{ sec_key }}">
+              <i class="bi {{ icon }} me-1"></i>{{ pill_label }}
+            </button>
+            {% endfor %}
+          </div>
+        </div>
+
+        <!-- ── Report panel ──────────────────────────────────────────── -->
+        <div class="report-panel" id="reportPanel">
+
+          <!-- Panel header -->
+          <div class="report-panel__header">
+            <div class="d-flex align-items-center gap-2">
+              <div class="results-icon" id="panelIcon">
+                <i class="bi bi-lightbulb-fill"></i>
+              </div>
+              <div>
+                <h5 class="results-title mb-0" id="panelTitle">Startup Summary</h5>
+                <small class="text-muted" id="panelMeta">IBM Granite · granite-4-h-small</small>
+              </div>
+            </div>
+            <button class="btn btn-sm btn-outline-secondary" id="copySectionBtn">
+              <i class="bi bi-clipboard me-1"></i>Copy
+            </button>
+          </div>
+
+          <!-- Report content -->
+          <div class="report-card__content" id="reportContent">
+            <!-- Injected by dashboard.js -->
+          </div>
+        </div>
+
+        <!-- Section navigation arrows -->
+        <div class="section-nav-arrows mt-3 d-flex justify-content-between" id="sectionNavArrows">
+          <button class="btn btn-outline-secondary btn-sm" id="prevSectionBtn" disabled>
+            <i class="bi bi-arrow-left me-1"></i>Previous
+          </button>
+          <span class="section-nav-label text-muted" id="sectionNavLabel">1 / 9</span>
+          <button class="btn btn-outline-secondary btn-sm" id="nextSectionBtn">
+            Next <i class="bi bi-arrow-right ms-1"></i>
+          </button>
+        </div>
+
+        <!-- ── Follow-up AI Assistant ──────────────────────────────────── -->
+        <div class="follow-up-container mt-4" id="followUpContainer">
+          <div class="card follow-up-card shadow-sm border rounded-3 overflow-hidden">
+            <div class="card-header follow-up-card-header d-flex align-items-center py-2 px-3">
+              <span class="fw-semibold small text-secondary">💬 Blueprint Assistant</span>
+            </div>
+            <div class="card-body p-3">
+              <!-- Thread of conversation responses -->
+              <div class="follow-up-thread mb-3 d-none" id="followUpThread">
+                <!-- Injected dynamically as chat messages -->
+              </div>
+              
+              <!-- Input box similar to ChatGPT -->
+              <div class="input-group">
+                <input type="text" class="form-control py-2 px-3 border-0 bg-opacity-10 bg-secondary" 
+                       id="followUpInput" 
+                       placeholder="Ask a follow-up question about this section..." 
+                       aria-label="Ask a follow-up question">
+                <button class="btn btn-primary px-3 d-flex align-items-center" type="button" id="followUpSendBtn">
+                  <span class="follow-up-send-default"><i class="bi bi-send-fill"></i></span>
+                  <span class="follow-up-send-loading d-none">
+                    <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                  </span>
+                </button>
+              </div>
+              
+              <!-- Clickable example suggestions (shown when input is empty) -->
+              <div class="follow-up-suggestions" id="followUpSuggestions">
+                <button class="follow-up-suggestion-pill" data-prompt="Make this suitable for India">Make this suitable for India</button>
+                <button class="follow-up-suggestion-pill" data-prompt="Add another user persona">Add another user persona</button>
+                <button class="follow-up-suggestion-pill" data-prompt="Simplify this explanation">Simplify this explanation</button>
+                <button class="follow-up-suggestion-pill" data-prompt="Improve the revenue strategy">Improve the revenue strategy</button>
+                <button class="follow-up-suggestion-pill" data-prompt="Generate more marketing ideas">Generate more marketing ideas</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div><!-- /#blueprintView -->
+
+    </div><!-- /.dashboard-content -->
+  </div><!-- /.dashboard-main -->
+
+</div><!-- /.dashboard-root -->
+
+<!-- Mobile sidebar backdrop -->
+<div class="sidebar-backdrop d-none" id="sidebarBackdrop"></div>
+
+<!-- ── Print-only View for PDF Export ──────────────────────────────── -->
+<div id="blueprintPrintView" class="print-only-container"></div>
+
+{% endblock %}
+
+{% block scripts %}
+<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.2/dist/chart.umd.min.js"></script>
+<script src="{{ url_for('static', filename='js/dashboard.js') }}"></script>
+{% endblock %}
+

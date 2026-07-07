@@ -1,0 +1,262 @@
+{% extends "base.html" %}
+
+{% block title %}BlueprintAI | Transform Your Startup Idea{% endblock %}
+
+{% block content %}
+
+<!-- ═══════════════════════════════════════════════════════════════════════
+     HERO SECTION
+═══════════════════════════════════════════════════════════════════════ -->
+<section class="hero-section">
+  <div class="hero-bg-pattern" aria-hidden="true"></div>
+  <div class="container-xl position-relative">
+    <div class="row align-items-center min-vh-screen py-5">
+
+      <!-- Left column — headline & CTA -->
+      <div class="col-lg-6 hero-content" data-animate="fadeInUp">
+        <div class="hero-badge mb-3">
+          <i class="bi bi-stars me-1"></i>
+          IBM watsonx.ai &nbsp;·&nbsp; Granite Foundation Model
+        </div>
+
+        <h1 class="hero-headline">
+          Turn Any Startup Idea Into a<br />
+          <span class="hero-accent">Complete Blueprint</span>
+        </h1>
+
+        <p class="hero-subtext mt-3 mb-4">
+          From raw concept to investor-ready strategy — generate market
+          research, competitor analysis, user personas, MVP plans, revenue
+          models, and full startup blueprints in seconds using enterprise-grade
+          IBM AI.
+        </p>
+
+        <!-- CTA buttons -->
+        <div class="d-flex flex-wrap gap-3 hero-ctas">
+          <a href="/dashboard" class="btn btn-primary btn-hero">
+            <i class="bi bi-rocket-takeoff me-2"></i>Start Building
+          </a>
+          <a href="#features" class="btn btn-outline-secondary btn-hero">
+            <i class="bi bi-play-circle me-2"></i>See How It Works
+          </a>
+        </div>
+
+        <!-- Social proof pills -->
+        <div class="hero-pills mt-4 d-flex flex-wrap gap-2">
+          <span class="hero-pill"><i class="bi bi-check-circle-fill"></i> Free to Use</span>
+          <span class="hero-pill"><i class="bi bi-shield-lock-fill"></i> IBM Granite AI</span>
+          <span class="hero-pill"><i class="bi bi-lightning-charge-fill"></i> Instant Results</span>
+        </div>
+      </div>
+
+      <!-- Right column — animated feature preview -->
+      <div class="col-lg-6 mt-5 mt-lg-0 hero-visual" data-animate="fadeInRight">
+        <div class="hero-card-stack">
+
+          <!-- Floating preview card 1 -->
+          <div class="preview-card preview-card--main">
+            <div class="preview-card__header">
+              <span class="preview-dot red"></span>
+              <span class="preview-dot yellow"></span>
+              <span class="preview-dot green"></span>
+              <span class="ms-2 preview-title">Blueprint Generator</span>
+            </div>
+            <div class="preview-card__body">
+              <div class="preview-input-mock">
+                <i class="bi bi-lightbulb-fill text-warning me-2"></i>
+                <span class="preview-input-text">AI-powered fitness coaching app for busy professionals…</span>
+                <span class="cursor-blink">|</span>
+              </div>
+              <div class="preview-modules mt-3">
+                <div class="preview-module-row">
+                  <span class="preview-module active"><i class="bi bi-graph-up-arrow me-1"></i>Market Research</span>
+                  <span class="preview-module"><i class="bi bi-people-fill me-1"></i>Personas</span>
+                </div>
+                <div class="preview-module-row mt-1">
+                  <span class="preview-module"><i class="bi bi-trophy-fill me-1"></i>Competitors</span>
+                  <span class="preview-module active"><i class="bi bi-layers-fill me-1"></i>MVP Plan</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Floating stat card -->
+          <div class="preview-card preview-card--stat preview-card--top-right">
+            <div class="stat-icon"><i class="bi bi-bar-chart-fill"></i></div>
+            <div class="stat-value">$4.2B</div>
+            <div class="stat-label">Market Size (TAM)</div>
+          </div>
+
+          <!-- Floating persona card -->
+          <div class="preview-card preview-card--stat preview-card--bottom-left">
+            <div class="stat-icon persona"><i class="bi bi-person-circle"></i></div>
+            <div class="stat-value" style="font-size:1rem;">Alex, 32</div>
+            <div class="stat-label">Product Manager · Primary Persona</div>
+          </div>
+
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════════════════
+     STATS BAR
+═══════════════════════════════════════════════════════════════════════ -->
+<section class="stats-bar">
+  <div class="container-xl">
+    <div class="row text-center gy-3">
+      <div class="col-6 col-md-3">
+        <div class="stat-num">13+</div>
+        <div class="stat-desc">Blueprint Sections</div>
+      </div>
+      <div class="col-6 col-md-3">
+        <div class="stat-num">9</div>
+        <div class="stat-desc">Specialized Modules</div>
+      </div>
+      <div class="col-6 col-md-3">
+        <div class="stat-num">IBM</div>
+        <div class="stat-desc">Granite AI Foundation</div>
+      </div>
+      <div class="col-6 col-md-3">
+        <div class="stat-num">&lt;30s</div>
+        <div class="stat-desc">Generation Time</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════════════════
+     FEATURES SECTION
+═══════════════════════════════════════════════════════════════════════ -->
+<section class="features-section section-pad" id="features">
+  <div class="container-xl">
+
+    <div class="section-header text-center mb-5">
+      <span class="section-badge">What You Get</span>
+      <h2 class="section-title mt-2">Everything You Need to Launch</h2>
+      <p class="section-subtitle">Nine specialized AI modules — each focused on a critical pillar of your startup.</p>
+    </div>
+
+    <div class="row g-4">
+      <!-- Feature cards -->
+      {% set features = [
+        ("bi-graph-up-arrow", "ibm-blue", "Market Research", "Uncover TAM/SAM/SOM, industry trends, growth drivers, and customer segments backed by AI analysis.", "market_research"),
+        ("bi-trophy-fill", "ibm-teal", "Competitor Analysis", "Identify key competitors, map their strengths and weaknesses, and find untapped market gaps.", "competitor_analysis"),
+        ("bi-people-fill", "ibm-purple", "User Personas", "Create 3 detailed user personas with goals, frustrations, and product fit narratives.", "user_personas"),
+        ("bi-layers-fill", "ibm-green", "MVP Planner", "Prioritize features using MoSCoW methodology to build exactly what your users need first.", "mvp_features"),
+        ("bi-building-fill", "ibm-orange", "Business Model", "Map your value proposition, customer segments, key activities, and cost structure.", "business_model"),
+        ("bi-currency-dollar", "ibm-gold", "Revenue Model", "Define revenue streams, pricing strategy, unit economics, and break-even estimates.", "revenue_model"),
+        ("bi-geo-alt-fill", "ibm-red", "Go-to-Market", "Build a launch playbook with traction channels, 90-day milestones, and partnership strategies.", "go_to_market"),
+        ("bi-shield-exclamation", "ibm-dark", "Risk Analysis", "Identify top 5 risks across market, tech, regulatory, and competitive dimensions.", "risk_analysis"),
+        ("bi-file-earmark-text-fill", "ibm-blue", "Full Blueprint", "Generate a comprehensive, investor-ready startup blueprint covering all 13 sections.", "full_blueprint")
+      ] %}
+
+      {% for icon, color, title, desc, mkey in features %}
+      <div class="col-sm-6 col-lg-4">
+        <div class="feature-card h-100" data-animate="fadeInUp">
+          <div class="feature-icon feature-icon--{{ color }}">
+            <i class="bi {{ icon }}"></i>
+          </div>
+          <h5 class="feature-title">{{ title }}</h5>
+          <p class="feature-desc">{{ desc }}</p>
+          <a href="/dashboard{% if mkey != 'full_blueprint' %}?module={{ mkey }}{% endif %}" class="feature-link">
+            Generate now <i class="bi bi-arrow-right ms-1"></i>
+          </a>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════════════════
+     HOW IT WORKS
+═══════════════════════════════════════════════════════════════════════ -->
+<section class="how-section section-pad">
+  <div class="container-xl">
+
+    <div class="section-header text-center mb-5">
+      <span class="section-badge">Process</span>
+      <h2 class="section-title mt-2">Three Steps to Your Blueprint</h2>
+    </div>
+
+    <div class="row g-4 justify-content-center">
+      <div class="col-md-4">
+        <div class="step-card text-center">
+          <div class="step-number">01</div>
+          <div class="step-icon"><i class="bi bi-lightbulb-fill"></i></div>
+          <h5 class="step-title">Describe Your Idea</h5>
+          <p class="step-desc">Type your startup concept — as brief or detailed as you like. Our AI asks follow-up questions if it needs more context.</p>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="step-card text-center">
+          <div class="step-number">02</div>
+          <div class="step-icon"><i class="bi bi-cpu-fill"></i></div>
+          <h5 class="step-title">IBM Granite Generates</h5>
+          <p class="step-desc">Hit Generate Blueprint and watch IBM Granite AI build all nine sections — market research, competitors, personas, MVP, revenue model, and more.</p>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="step-card text-center">
+          <div class="step-number">03</div>
+          <div class="step-icon"><i class="bi bi-file-earmark-check-fill"></i></div>
+          <h5 class="step-title">Review &amp; Export</h5>
+          <p class="step-desc">Read your professionally structured report, copy sections to clipboard, and iterate with follow-up questions.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- CTA -->
+    <div class="text-center mt-5">
+      <a href="/dashboard" class="btn btn-primary btn-lg px-5 fw-semibold">
+        <i class="bi bi-rocket-takeoff me-2"></i>Launch Dashboard
+      </a>
+    </div>
+
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════════════════
+     IBM GRANITE BADGE SECTION
+═══════════════════════════════════════════════════════════════════════ -->
+<section class="ibm-section section-pad">
+  <div class="container-xl">
+    <div class="ibm-banner">
+      <div class="row align-items-center gy-4">
+        <div class="col-lg-8">
+          <div class="ibm-logo-line d-flex align-items-center gap-3 mb-3">
+            <span class="ibm-badge">IBM</span>
+            <span class="ibm-model-name">watsonx.ai &nbsp;·&nbsp; Granite Foundation Model</span>
+          </div>
+          <h3 class="ibm-headline">Enterprise-Grade AI You Can Trust</h3>
+          <p class="ibm-desc mt-2">
+            Every blueprint is generated by IBM's Granite language models — trained on business,
+            finance, and technology corpora and purpose-built for enterprise reasoning tasks.
+            Your ideas stay private. Your outputs stay actionable.
+          </p>
+          <div class="d-flex flex-wrap gap-3 mt-3">
+            <span class="ibm-tag"><i class="bi bi-check2-circle me-1"></i>Responsible AI</span>
+            <span class="ibm-tag"><i class="bi bi-check2-circle me-1"></i>Enterprise Security</span>
+            <span class="ibm-tag"><i class="bi bi-check2-circle me-1"></i>Transparent Model</span>
+            <span class="ibm-tag"><i class="bi bi-check2-circle me-1"></i>Business-Optimised</span>
+          </div>
+        </div>
+        <div class="col-lg-4 text-center">
+          <div class="ibm-granite-icon">
+            <i class="bi bi-cpu-fill"></i>
+          </div>
+          <div class="ibm-granite-label">Granite 4 · granite-4-h-small</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/landing.js') }}"></script>
+{% endblock %}
