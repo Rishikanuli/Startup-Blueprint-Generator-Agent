@@ -10,7 +10,7 @@ BlueprintAI is a high-performance, developer-friendly startup planning assistant
 
 ## 🎥 Live Demo
 
-- **🔗 LinkedIn Demo Video**: [https://www.linkedin.com/posts/rishikasri_ibm-ibmskillsbuild-aicte-ugcPost-7480634456375001088-h68w/?utm_source=share&utm_medium=member_desktop&rcm=ACoAAGRJ1NEBUdn5Ib86LVwKJYtGxljZszVpwQQ](<Add LinkedIn Post URL>)
+- **🔗 LinkedIn Demo Video**: https://www.linkedin.com/posts/rishikasri_ibm-ibmskillsbuild-aicte-ugcPost-7480634456375001088-h68w/?utm_source=share&utm_medium=member_desktop&rcm=ACoAAGRJ1NEBUdn5Ib86LVwKJYtGxljZszVpwQQ (<Add LinkedIn Post URL>)
 
 > [!NOTE]
 > We highly encourage visitors to watch the live demo video to understand the complete user workflow, features, and real-time generation capabilities of BlueprintAI before exploring the source code.
