@@ -223,13 +223,30 @@ I want to build a smart B2C subscription app called 'EcoTrack' that helps househ
 
 Here is a look at the BlueprintAI interface in action:
 
-| Screen | Preview |
-|---|---|
-| **Landing Page** | ![Landing Page](static/images/media__1783357625804.png) |
-| **Interactive Blueprint Generation** | ![Dashboard Initial](static/images/media__1783357972983.png) |
-| **Smart Follow-up Clarification** | ![Follow-up suggestions](static/images/media__1783358403980.png) |
-| **Interactive Metrics & Charts** | ![Interactive charts](static/images/media__1783358831489.png) |
-| **Responsive Dark Mode UI** | ![Dark mode dashboard](static/images/media__1783435500763.png) |
+### 1. Landing Page
+Modern landing page introducing BlueprintAI, highlighting AI-powered startup blueprint generation using IBM Granite Foundation Models.
+
+![Landing Page](assets/screenshots/landing-page.png)
+
+### 2. BlueprintAI Generator Dashboard
+Interactive dashboard where users describe their startup idea and generate a complete business blueprint with a single click.
+
+![Blueprint Generator Dashboard](assets/screenshots/dashboard.png)
+
+### 3. BlueprintAI Features Overview
+Overview of all AI-powered modules including Market Research, Competitor Analysis, User Personas, MVP Planner, Business Model, Revenue Model, Go-to-Market Strategy, Risk Analysis, and Full Blueprint generation.
+
+![Blueprint Features Overview](assets/screenshots/features-overview.png)
+
+### 4. Generated Startup Blueprint
+Example of an AI-generated startup report containing an executive summary, problem statement, proposed solution, and value proposition generated entirely from the user's prompt.
+
+![Generated Startup Blueprint](assets/screenshots/startup-blueprint.png)
+
+### 5. Interactive Business Model Canvas
+Visual AI-generated Business Model Canvas showing customer segments, value proposition, revenue streams, channels, partnerships, resources, activities, and cost structure.
+
+![Interactive Business Model Canvas](assets/screenshots/business-model.png)
 
 ---
 
